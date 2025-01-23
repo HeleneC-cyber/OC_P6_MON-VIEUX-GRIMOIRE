@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+// useNavigate, (à rajouter entre Link et useParams)
 import styles from './UpdateBook.module.css';
 import BookForm from '../../components/Books/BookForm/BookForm';
 import BackArrow from '../../components/BackArrow/BackArrow';
