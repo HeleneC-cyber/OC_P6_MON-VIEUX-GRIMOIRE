@@ -49,20 +49,20 @@ const fs = require('fs')
 // Création d'un nouveau livre après vérification des champs par middleware validateBook
 exports.createBook = (req, res, next) => {
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'Vous devez ajouter une image.' })
-    }
+  if (!req.file) {
+    return res.status(400).json({ error: 'Vous devez ajouter une image.' })
+  }
 
-    const bookObject = JSON.parse(req.body.book)
+  const bookObject = JSON.parse(req.body.book)
 
-    const book = new Book({
-      ...bookObject,
-      userId: req.auth.userId,
-      imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}` //Génère l'url de l'image
-    })
-    book.save()
-      .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
-      .catch(error => res.status(400).json({ error }))
+  const book = new Book({
+    ...bookObject,
+    userId: req.auth.userId,
+    imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}` //Génère l'url de l'image
+  })
+  book.save()
+    .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
+    .catch(error => res.status(400).json({ error }))
 
 }
 
@@ -70,46 +70,94 @@ exports.createBook = (req, res, next) => {
 
 
 // Modification des données d'un livre
-exports.updateBook = (req, res) => {
-  const bookObject = req.file ? {
-    ...JSON.parse(req.body.book),
-    imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}`
-  } : { ...req.body }
+exports.updateBook = async (req, res) => {
+  try {
+    const bookId = req.params.id
+    const book = await Book.findOne({ _id: bookId })
 
-  // Récupére le livre existant
-  Book.findOne({ _id: req.params.id })
-    .then((book) => {
-
-      if (!book) {
-        return res.status(404).json({ message: 'Livre non trouvé' })
+    if (!book) {
+      return res.status(404).json({ message: 'Livre non trouvé' })
+    }
+    // Vérifie l'autorisation
+    if (book.userId != req.auth.userId) {
+      if (req.file) {
+        fs.unlink(`upload/${req.file.filename}`, (err) => {
+          if (err) console.error('Erreur lors de la suppression du fichier non autorisé :', err)
+        })
       }
+      return res.status(403).json({ message: 'Requête non autorisé' })
+    }
 
-      if (book.userId != req.auth.userId) {
-        return res.status(403).json({ message: 'Requête non autorisé' }) // => Si c'est le cas, fait crash l'app...
 
-      } else {
 
-        // Si une nouvelle image est envoyée
-        if (req.file) {
-          const oldImagePath = book.imageUrl.split(`${req.get('host')}/`)[1] //Extrait le chemin de l'ancienne image
-          fs.unlink(oldImagePath, (err) => { // Supprime l'ancienne image
-            if (err) {
-              console.error("Erreur lors de la suppression de l'ancienne image :", err)
-            } else {
-              console.log("Ancienne image supprimée avec succès.")
-            }
-          })
-        }
-
-        // Mise à jour des données du livre
-        return Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+    //Gestion de nouvelle image envoyée
+    if (req.file) {
+      const imageUrl = `${req.protocol}://${req.get('host')}/upload/${req.file.filename}`
+      if (book.imageUrl) {
+        const oldImagePath = book.imageUrl.split(`/upload/`)[1] //Extrait le chemin de l'ancienne image
+        fs.unlink(`upload/${oldImagePath}`, (err) => { // Supprime l'ancienne image
+          if (err) console.error('Erreur lors de la suppression de l\'ancienne image :', err)
+        })
       }
-    })
-    .then(() => res.status(200).json({ message: 'Livre modifié' }))
-    .catch((error) => {
-      console.error('Erreur lors de la mise à jour du livre :', error)
-      res.status(400).json({ error })
-    })
+      book.imageUrl = imageUrl
+    }
+
+    //Mise à  jour du livre
+    const bookObject = req.file ? {
+      ...JSON.parse(req.body.book),
+      imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}`
+    } : { ...req.body }
+
+    const updateBook = await Book.findByIdAndUpdate(bookId, bookObject, { new: true })
+    return res.status(200).json(updateBook)
+
+  } catch (error) {
+    return res.status(500).json({ error: 'Erreur lors de la mise à jour du livre' })
+  }
+
+
+
+
+
+  // const bookObject = req.file ? {
+  //   ...JSON.parse(req.body.book),
+  //   imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}`
+  // } : { ...req.body }
+
+  // // Récupére le livre existant
+  // Book.findOne({ _id: req.params.id })
+  //   .then((book) => {
+
+  //     if (!book) {
+  //       return res.status(404).json({ message: 'Livre non trouvé' })
+  //     }
+
+  //     if (book.userId != req.auth.userId) {
+  //       return res.status(403).json({ message: 'Requête non autorisé' }) // => Si c'est le cas, fait crash l'app...
+
+  //     } else {
+
+  //       // Si une nouvelle image est envoyée
+  //       if (req.file) {
+  //         const oldImagePath = book.imageUrl.split(`${req.get('host')}/`)[1] //Extrait le chemin de l'ancienne image
+  //         fs.unlink(oldImagePath, (err) => { // Supprime l'ancienne image
+  //           if (err) {
+  //             console.error("Erreur lors de la suppression de l'ancienne image :", err)
+  //           } else {
+  //             console.log("Ancienne image supprimée avec succès.")
+  //           }
+  //         })
+  //       }
+
+  //       // Mise à jour des données du livre
+  //       return Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
+  //     }
+  //   })
+  //   .then(() => res.status(200).json({ message: 'Livre modifié' }))
+  //   .catch((error) => {
+  //     console.error('Erreur lors de la mise à jour du livre :', error)
+  //     res.status(400).json({ error })
+  //   })
 
 }
 

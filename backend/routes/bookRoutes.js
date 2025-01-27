@@ -21,8 +21,8 @@ router.get('/bestrating', ratingController.getBestRatedBooks)
 router.get('/:id', bookController.getBook)
 router.post('/', auth, multerMiddleware, optimizeImage, validateBook, bookController.createBook) 
 router.put('/:id', auth, multerMiddleware, optimizeImage, validateBook, bookController.updateBook)
-router.delete('/:id', auth, bookController.deleteBook) //auth, 
 // router.post('/:id/rating', auth, ratingController.addRating)
+router.delete('/:id', auth, bookController.deleteBook)
 
 
 

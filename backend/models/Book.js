@@ -15,8 +15,8 @@ const bookSchema = mongoose.Schema({
         grade: { 
             type: Number, 
             required: true, 
-            min: [0, 'La note doit être au moins de 0'],
-            max: [5, 'La note ne peut pas dépasser 5']
+            min: 0,
+            max: 5
         },
     }],
     averageRating: { type: Number, required: true },
