@@ -1,13 +1,15 @@
-// Création d'un programme qui attend des requêtes http
-
-// Import le package http de node
-const http = require('http')
-
-// Import de l'application express
-const app = require('./app')
+/********************************/
+/**** Imports ****/
+const http = require('http') // Import le package http de node
+const app = require('./app') // Import de l'application express
 
 
-// Fonction qui revoie un port valide (que ça soit un nombre ou un string)
+
+//Création d'un programme qui attend des requêtes http
+
+/********************************/
+/**** Port ****/ 
+// Fonction qui revoie un port valide (nombre ou string)
 const normalizePort = val => {
     const port = parseInt(val, 10);
     if (isNaN(port)) {
@@ -22,6 +24,11 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '4000') // Récupère le port
 app.set('port', port) // Donne le port à utiliser pour l'application
 
+
+
+
+/********************************/
+/**** Gestion de l'erreur ****/ 
 // Fonction qui recherche et gère les erreurs
 const errorHandler = error => {
     if (error.syscall !== 'listen') {
@@ -43,7 +50,11 @@ const errorHandler = error => {
     }
 }
 
-// Création d'un serveur via la méthode createServeur qui prend en argument l'application express (=fonction qui prend en compte requête et réponse)
+
+
+/********************************/
+/**** Création d'un serveur ****/ 
+// méthode createServeur : prend en argument l'application express (=prend en compte requête et réponse)
 const server = http.createServer(app)
 
 server.on('error', errorHandler) // fonction enregistrée dans le serveur
@@ -53,7 +64,6 @@ server.on('listening', () => {
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port
   console.log('Listening on ' + bind) //Consigne le port utilisé dans la console
 })
-
 
 // Serveur attend les requêtes envoyées depuis le port
 server.listen(port)

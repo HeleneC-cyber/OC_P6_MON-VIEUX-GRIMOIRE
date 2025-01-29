@@ -10,7 +10,7 @@ const userSchema = mongoose.Schema({
         unique: true, //une seule inscription possible par email
         match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ //Validation du format de l'email
     }, 
-    password: { type: String, required: true }, //, minlength: 8
+    password: { type: String, required: true }, //, minlength: 6
 })
 
 // userSchema.plugin(uniqueValidator) // Renforce l'unicité et améliore message erreur lors de l'inscription
