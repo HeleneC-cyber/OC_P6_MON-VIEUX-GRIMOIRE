@@ -39,7 +39,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "http://localhost:3000"], // Ajoute ton domaine si nécessaire
+      imgSrc: ["'self'", "data:", "http://localhost:3000"],
       scriptSrc: ["'self'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [], //indique au navigateur de convertir automatiquement toutes les requêtes HTTP en HTTPS

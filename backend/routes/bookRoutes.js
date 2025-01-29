@@ -7,7 +7,6 @@ const bookController = require('../controllers/bookController')
 const multerMiddleware = require('../middlewares/multer-config')
 const optimizeImage = require('../middlewares/sharp-config')
 const validateBook = require('../middlewares/validateBook')
-// const handleFile = require('../middlewares/handleFile')
 const ratingController = require('../controllers/ratingController')
 
 
