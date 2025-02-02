@@ -1,23 +1,22 @@
 /********************************/
 /**** Imports ****/
-const express = require('express') //méthode express
-const mongoose = require('mongoose') //mongoose
-const bodyParser = require('body-parser')
+const express = require('express')
+const mongoose = require('mongoose')
 const path = require('path')
 const helmet = require('helmet')
 const cors = require('cors')
 require('dotenv').config()
 
-const booksRouter = require('./routes/bookRoutes') //Routeur pour les livres
-const usersRouter = require('./routes/userRoutes') //Routeur pour les utilisateurs
+const booksRouter = require('./routes/bookRoutes')
+const usersRouter = require('./routes/userRoutes') 
 
 const { generalLimiter } = require('./middlewares/limiter')
 
 
 
 /********************************/
-/**** Connexion à l'API ****/
-// connecte application express avec la base de données (mongoDB)
+/**** API connection ****/
+// connects express application with database (mongoDB)
 mongoose.connect(
   process.env.MONGODB_URI,
   { useNewUrlParser: true,
@@ -25,15 +24,14 @@ mongoose.connect(
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'))
 
-const app = express() // appelle la méthode express pour créer l'application express
+const app = express() // calls the express method to create the express application
 
 
 
 /********************************/
 /**** Middlewares ****/ 
-// Intercepte les requêtes ayant un contenu json et permet d'accéder à ce contenu dans req.body (rend les données du corps de la requête exploitables)
 
-// Sécurise les en-tête HTTP
+// Secure HTTP headers
 app.use(helmet({ 
   crossOriginResourcePolicy: false,
   contentSecurityPolicy: {
@@ -42,38 +40,31 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "http://localhost:3000"],
       scriptSrc: ["'self'"],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: [], //indique au navigateur de convertir automatiquement toutes les requêtes HTTP en HTTPS
+      upgradeInsecureRequests: [], // tells the browser to automatically convert all HTTP requests to HTTPS
     },
   },
-  xssFilter: true, // Protection contre les attaques XSS 
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // Evite d'envoyer trop d'infos dans l'en-tête Referer
+  xssFilter: true, // Protection against XSS attacks 
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // Avoid sending too much information in the Referer header
 }))
-app.disable('x-powered-by') //Deja caché en principe par Helmet, 2e sécurité
+app.disable('x-powered-by') //Already hidden in principle by Helmet (2nd security)
 
 
-app.use(express.json()) // OU app.use(bodyParser.json())
+app.use(express.json()) // Or app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true })) 
 
+// Cross-Origin Resource Sharing
 app.use( cors({
   origin:'http://localhost:3000',
   allowedHeaders: 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization', //Autorise d'utiliser les en-têtes cités
   methods: ['GET','POST', 'PUT', 'DELETE']
 }) )
-// Configuration par défaut des cors :
+// Default CORS configuration:
 /* {
   "origin": "*",
   "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
   "preflightContinue": false,
   "optionsSuccessStatus": 204
 } */
-
-// app.use((req, res, next) => {
-//   // Ajout d'en-têtes à l'objet réponse renvoyé au navigateur pour autoriser l'accès
-//   res.setHeader('Access-Control-Allow-Origin', '*') //Tout le monde a le droit d'accéder à l'API (pour l'instant)
-//   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization') //Autorisation d'utiliser les en-têtes cités
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE') //Accès à certaines requêtes
-//   next() // next appelé, permet de renvoyer à la prochaine fonction
-// })
 
 app.use('/api', generalLimiter)
 
@@ -85,5 +76,5 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
 
 /********************************/
-/**** Export de l'application ****/ 
+/**** Application export ****/ 
 module.exports = app

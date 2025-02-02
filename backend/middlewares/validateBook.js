@@ -1,23 +1,22 @@
 const fs = require('fs')
 
 
-// Middleware pour valider les données du formulaire
+
+// Middleware to validate form data
 const validateBook = (req, res, next) => {
-  // Deux cas possibles : requête comporte un fichier ou non
+  //  Two possible cases: request includes a file or not
     const bookObject = req.file ? {
-      // Si oui alors présence d'un fichier dans la requête
-      //Opérateur spread : Copie les champs dans le corps de la requête
-      // Parse la chaine de caractère cad transforme l'objet stringifié en Object JavaScript exploitable
-      ...JSON.parse(req.body.book),
-      imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}` //Génère l'url de l'image
-    } : { ...req.body } //Sinon, récupère l'objet du corps de la requête
+      // If a file is present
+      ...JSON.parse(req.body.book),// Parse the string (transforms the stringified object into a usable JavaScript Object)
+      imageUrl: `${req.protocol}://${req.get('host')}/upload/${req.file.filename}` // Generate image url
+    } : { ...req.body } // Otherwise, retrieve the request body object
 
-    delete bookObject._id // Supprime le champ id
-    delete bookObject._userId // Supprime le champ userId
+    delete bookObject._id // Delete id field
+    delete bookObject._userId // Delete userId field
 
-    // Vérifie que tous les champs du formulaire sont valides
+    // Check that all form fields are valid
     if (!bookObject.title || !bookObject.author || !bookObject.year || isNaN(bookObject.year) || !bookObject.genre) {
-            // Si un des champs invalide et qu'il y a un fichier, supprime le fichier image
+            // If one of the fields is invalid and there is a file, delete the image file.
       if (req.file) {
         fs.unlink(req.file.path, (error) => {
           if (error) {
@@ -27,11 +26,10 @@ const validateBook = (req, res, next) => {
           }
         })
       }
-
       return res.status(400).json({ error: 'Tous les champs requis doivent être fournis dans le bon format.' })
     }
 
-    next() // Passe au middleware suivant
+    next() // Go to next middleware
 }
 
 

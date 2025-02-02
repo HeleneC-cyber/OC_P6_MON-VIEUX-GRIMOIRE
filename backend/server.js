@@ -5,11 +5,11 @@ const app = require('./app') // Import de l'application express
 
 
 
-//Création d'un programme qui attend des requêtes http
+// Create a program that waits for http requests
 
 /********************************/
 /**** Port ****/ 
-// Fonction qui revoie un port valide (nombre ou string)
+// Function that returns a valid port (number or string)
 const normalizePort = val => {
     const port = parseInt(val, 10);
     if (isNaN(port)) {
@@ -21,15 +21,15 @@ const normalizePort = val => {
     return false
 }
 
-const port = normalizePort(process.env.PORT || '4000') // Récupère le port
-app.set('port', port) // Donne le port à utiliser pour l'application
+const port = normalizePort(process.env.PORT || '4000') // Retrieve port
+app.set('port', port) // Set the port to be used for the application
 
 
 
 
 /********************************/
-/**** Gestion de l'erreur ****/ 
-// Fonction qui recherche et gère les erreurs
+/**** Error handling ****/ 
+// Error search and management function
 const errorHandler = error => {
     if (error.syscall !== 'listen') {
         throw error
@@ -53,17 +53,17 @@ const errorHandler = error => {
 
 
 /********************************/
-/**** Création d'un serveur ****/ 
-// méthode createServeur : prend en argument l'application express (=prend en compte requête et réponse)
+/**** Creating a server ****/ 
+// createServer method: takes express application as argument (request and response)
 const server = http.createServer(app)
 
-server.on('error', errorHandler) // fonction enregistrée dans le serveur
-// écouteur d'événement enregistré dans le serveur
+server.on('error', errorHandler) // function stored in the server
+// event listener registered in server
 server.on('listening', () => {
   const address = server.address()
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port
-  console.log('Listening on ' + bind) //Consigne le port utilisé dans la console
+  console.log('Listening on ' + bind) // Set the port used in the console
 })
 
-// Serveur attend les requêtes envoyées depuis le port
+// Server waits for requests sent from port
 server.listen(port)

@@ -4,28 +4,26 @@ const path = require('path')
 const fs = require('fs')
 
 
-// Configuration pour optimiser les images :
+// Configuration for image optimization :
 const optimizeImage = async (req, res, next) => {
     try {
         if (!req.file) {
             next()
         } else {
 
-            // Chemin du fichier original
+            //  Original file path
             const inputPath = req.file.path
 
-            // Nouveau chemin pour le fichier optimisé
-            const fileNameWithoutExt = path.basename(req.file.originalname, path.extname(req.file.originalname)) //Fichier sans l'extension
+            // New path for optimized file
+            const fileNameWithoutExt = path.basename(req.file.originalname, path.extname(req.file.originalname)) // File without extension
             const outputPath = path.join('upload', `${fileNameWithoutExt}_${Date.now()}.webp`)
-            // console.log('Chemin fichier transformé (path) :', req.file.path)
-            // console.log('Nom original du fichier (originalname) :', req.file.originalname)
-
-
+       
+            // Optimization with Sharp
             const sharpInstance = sharp(await fs.promises.readFile(inputPath))
-                .resize(500) // Redimensionne à une largeur de 500px (hauteur calculée automatiquement)
-                .webp({ quality: 80 }) // Convertit en webp avec qualité 80%
+                .resize(500) // Resize to 500px width (automatically calculated height)
+                .webp({ quality: 80 }) // Convert to webp with 80% quality
 
-            await sharpInstance.toFile(outputPath) // Enregistre l'image optimisée
+            await sharpInstance.toFile(outputPath) // Saves optimized image
             await fs.promises.unlink(inputPath, (error) => {
                 if (error) {
                     console.error('Erreur lors de la suppression de l\'image d\'origine :', error)
@@ -34,29 +32,12 @@ const optimizeImage = async (req, res, next) => {
                 }
             })
 
-            // Optimisation avec Sharp
-            // await sharp(inputPath)
-            //     .resize(500) // Redimensionne à une largeur de 500px (hauteur calculée automatiquement)
-            //     .webp({ quality: 80 }) // Convertit en webp avec qualité 80%
-            //     .toFile(outputPath) // Enregistre l'image optimisée
-            // console.log('Image optimisée enregistrée.')
-
-            // fs.unlink(inputPath, (error) => {
-            //     if (error) {
-            //         console.error('Erreur lors de la suppression de l\'image d\'origine :', error)
-            //     } else {
-            //         console.log('Image originale supprimée.')
-            //     }
-            // })
-
-
-
-            // MAJ du chemin, vers fichier optimisé
+            // Update path to optimized file
             req.file.path = outputPath;
             req.file.destination = 'upload';
             req.file.filename = path.basename(outputPath);
 
-            next() // Passe au middleware suivant
+            next() // Go to next middleware
         }
     } catch (error) {
         console.error('Erreur lors de l\'optimisation de l\'image :', error)
@@ -64,5 +45,7 @@ const optimizeImage = async (req, res, next) => {
         res.status(500).json({ error })
     }
 }
+
+
 
 module.exports = optimizeImage

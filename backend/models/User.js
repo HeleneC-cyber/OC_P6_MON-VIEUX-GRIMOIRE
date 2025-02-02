@@ -1,20 +1,20 @@
-// Import de mongoose
+// Import
 const mongoose = require('mongoose')
-// const uniqueValidator = require('mongoose-unique-validator')
 
-// Création d'un schéma de données pour l'ajout d'un utilisateur
+
+
+// Create a data schema for adding a user
 const userSchema = mongoose.Schema({
     email: { 
         type: String, 
         required: true, 
-        unique: true, //une seule inscription possible par email
-        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ //Validation du format de l'email
+        unique: true, // only one registration per e-mail
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Email format validation
     }, 
-    password: { type: String, required: true }, //, minlength: 6
+    password: { type: String, required: true }, //Other possible password characteristics : minlength: 6
 })
 
-// userSchema.plugin(uniqueValidator) // Renforce l'unicité et améliore message erreur lors de l'inscription
 
 
-// Export du modèle User
+// Export User model
 module.exports = mongoose.model('User', userSchema)
