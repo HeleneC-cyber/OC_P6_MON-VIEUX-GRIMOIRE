@@ -55,7 +55,7 @@
 3. **Installer les dépendances** :
    ```bash
    npm install
-4. ** Configurer** les variables d'environnement (créer un fichier.env)
+4. **Configurer** les variables d'environnement (créer un fichier.env)
 5. **Lancer l'application** en mode développement
 <br><br>
 
