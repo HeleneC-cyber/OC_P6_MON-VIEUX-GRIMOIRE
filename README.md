@@ -36,12 +36,12 @@
 ## 📂 Structure
 📁  OC_P6_MON-VIEUX-GRIMOIRE/<br>
 │── 📁 backend/<br>
-│    └── 📁 controllers/    # Logique métier<br>
-│    └── 📁 middleware/     # Gestion de la sécurité (authentification, multer...)<br>
-│    └── 📁 models/         # Modèles Mongoose<br>
-│    └── 📁 routes/         # Déclaration des routes API<br>
-│    └── 📁 utils/          # Fonctions utilitaires<br>
-│    └── server.js          # Point d'entrée du serveur<br>
+│    └── 📁 controllers/    <i># Logique métier</i> <br>
+│    └── 📁 middleware/     <i># Gestion de la sécurité (authentification, multer...)</i> <br>
+│    └── 📁 models/         <i># Modèles Mongoose</i> <br>
+│    └── 📁 routes/         <i># Déclaration des routes API</i> <br>
+│    └── 📁 utils/          <i># Fonctions utilitaires</i> <br>
+│    └── server.js           <i># Point d'entrée du serveur</i> <br>
 │──  README.md   
 <br><br>
 
